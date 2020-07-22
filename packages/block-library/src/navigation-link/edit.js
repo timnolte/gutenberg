@@ -28,6 +28,7 @@ import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
+	BlockToolbarLinkControl,
 	InnerBlocks,
 	InspectorControls,
 	RichText,
@@ -123,6 +124,7 @@ function NavigationLinkEdit( {
 	attributes,
 	hasDescendants,
 	isSelected,
+	isExperimentalNavScreen = false,
 	isImmediateParentOfSelectedBlock,
 	isParentOfSelectedBlock,
 	setAttributes,
@@ -150,6 +152,8 @@ function NavigationLinkEdit( {
 	} = attributes;
 	const link = {
 		url,
+		rel,
+		label,
 		opensInNewTab,
 	};
 	const { saveEntityRecord } = useDispatch( 'core' );
@@ -186,7 +190,7 @@ function NavigationLinkEdit( {
 
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
-		if ( isLinkOpen && url ) {
+		if ( isLinkOpen && url && ! isExperimentalNavScreen ) {
 			// Does this look like a URL and have something TLD-ish?
 			if (
 				isURL( prependHTTP( label ) ) &&
@@ -239,6 +243,14 @@ function NavigationLinkEdit( {
 
 	return (
 		<Fragment>
+			{ isExperimentalNavScreen && isLinkOpen && (
+				<BlockToolbarLinkControl
+					initialLink={ link }
+					createSuggestion={ handleCreatePage }
+					close={ () => setIsLinkOpen( false ) }
+					onChange={ ( args ) => setAttributes( args ) }
+				/>
+			) }
 			<BlockControls>
 				<ToolbarGroup>
 					<KeyboardShortcuts
@@ -341,7 +353,7 @@ function NavigationLinkEdit( {
 							'core/strikethrough',
 						] }
 					/>
-					{ isLinkOpen && (
+					{ ! isExperimentalNavScreen && isLinkOpen && (
 						<Popover
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
@@ -482,6 +494,11 @@ export default compose( [
 			getBlockParentsByBlockName( clientId, 'core/navigation' )
 		);
 		const navigationBlockAttributes = getBlockAttributes( rootBlock );
+		const isExperimentalNavScreen = get(
+			getSettings(),
+			'__experimentalNavigationScreen',
+			false
+		);
 		const colors = get( getSettings(), 'colors', [] );
 		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] )
 			.length;
@@ -498,6 +515,7 @@ export default compose( [
 		] )?.length;
 
 		return {
+			isExperimentalNavScreen,
 			isParentOfSelectedBlock,
 			isImmediateParentOfSelectedBlock,
 			hasDescendants,
