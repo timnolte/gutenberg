@@ -196,7 +196,9 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 
 				[
 					widgetArea,
-					__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
+					__experimentalEnableLegacyWidgetBlock
+						? legacyWidget.create( settings )
+						: null,
 					navigation,
 					navigationLink,
 
