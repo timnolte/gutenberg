@@ -191,36 +191,6 @@ function gutenberg_register_widgets() {
 	}
 
 	register_widget( 'WP_Widget_Block' );
-	// By default every widget on widgets.php is wrapped with a <form>.
-	// This means that you can sometimes end up with invalid HTML, e.g. when
-	// one of the widgets is a Search block.
-	//
-	// To fix the problem, let's add a filter that moves the form below the actual
-	// widget content.
-	global $pagenow;
-	if ( 'widgets.php' === $pagenow ) {
-		add_filter(
-			'dynamic_sidebar_params',
-			'gutenberg_override_sidebar_params_for_block_widget'
-		);
-	}
-}
-
-/**
- * Overrides dynamic_sidebar_params to make sure Blocks are not wrapped in <form> tag.
- *
- * @param  array $arg Dynamic sidebar params.
- * @return array Updated dynamic sidebar params.
- */
-function gutenberg_override_sidebar_params_for_block_widget( $arg ) {
-	if ( 'Block' === $arg[0]['widget_name'] ) {
-		$arg[0]['before_form']           = '';
-		$arg[0]['before_widget_content'] = '<div class="widget-content">';
-		$arg[0]['after_widget_content']  = '</div><form class="block-widget-form">';
-		$arg[0]['after_form']            = '</form>';
-	}
-
-	return $arg;
 }
 
 add_action( 'widgets_init', 'gutenberg_register_widgets' );
