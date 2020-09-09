@@ -134,8 +134,9 @@ function QuickInserter( {
 		blockTypeCollections,
 		onSelectBlockType,
 	] = useBlockTypesState( destinationRootClientId, onInsertBlocks );
-	const [ patterns, , onSelectBlockPattern ] = usePatternsState(
-		onInsertBlocks
+	const [ , patterns, , onSelectBlockPattern ] = usePatternsState(
+		onInsertBlocks,
+		'all'
 	);
 	const showPatterns =
 		! destinationRootClientId && patterns.length && !! filterValue;
